@@ -2,253 +2,94 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ליל המתים – משחק זומבים תלת מימד</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>המטבח שלי – מתכונים</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
 <style>
-html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Arial,Helvetica,sans-serif;color:#fff;user-select:none}
-canvas{display:block}
-#vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(190,0,0,.85) 100%);opacity:0}
-#cross{position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none}
-#cross:before,#cross:after{content:"";position:absolute;background:#fff;opacity:.85}
-#cross:before{left:10px;top:0;width:2px;height:22px;-webkit-mask:linear-gradient(#000 35%,transparent 35% 65%,#000 65%);mask:linear-gradient(#000 35%,transparent 35% 65%,#000 65%)}
-#cross:after{top:10px;left:0;height:2px;width:22px;-webkit-mask:linear-gradient(90deg,#000 35%,transparent 35% 65%,#000 65%);mask:linear-gradient(90deg,#000 35%,transparent 35% 65%,#000 65%)}
-#hit{position:fixed;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border:3px solid #f33;transform:rotate(45deg);opacity:0;pointer-events:none}
-#hud{position:fixed;inset:0;pointer-events:none;text-shadow:0 2px 6px #000}
-#hp{position:absolute;left:24px;bottom:24px;width:260px}
-#hp b{font-size:14px}
-#hpbar{height:16px;background:#0008;border:2px solid #fff6;border-radius:8px;overflow:hidden;margin-top:4px}
-#hpfill{height:100%;width:100%;background:linear-gradient(90deg,#b00,#e33)}
-#ammo{position:absolute;right:24px;bottom:20px;font-size:44px;font-weight:bold;direction:ltr}
-#ammo small{font-size:22px;opacity:.7}
-#info{position:absolute;right:24px;top:18px;font-size:20px;text-align:right;line-height:1.5}
-#banner{position:absolute;top:22%;width:100%;text-align:center;font-size:64px;font-weight:bold;color:#f33;opacity:0;transition:opacity .6s}
-#msg{position:absolute;bottom:90px;width:100%;text-align:center;font-size:20px;opacity:0}
-.scr{position:fixed;inset:0;background:#000c;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-.scr h1{font-size:clamp(40px,8vw,84px);margin:0 0 8px;color:#d33;letter-spacing:2px}
-.scr p{max-width:560px;line-height:1.8;color:#ddd;margin:6px 0}
-.scr button{margin-top:22px;padding:14px 44px;font-size:22px;font-weight:bold;background:#b11;color:#fff;border:0;border-radius:8px;cursor:pointer}
-.scr button:hover{background:#d22}
-kbd{background:#333;border:1px solid #666;border-radius:4px;padding:1px 7px}
+:root{--bg:#F6F8F4;--surface:#fff;--ink:#17241D;--muted:#5B6B62;--green:#1F4D36;--lemon:#F2D84B;--chili:#D6402B;--line:#DCE4DD;--tile:#E8EFE6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101A14;--surface:#18271E;--ink:#EEF3EC;--muted:#A3B5A9;--green:#8FD4A8;--line:#2B4034;--tile:#22372B;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101A14;--surface:#18271E;--ink:#EEF3EC;--muted:#A3B5A9;--green:#8FD4A8;--line:#2B4034;--tile:#22372B;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Assistant,Arial,sans-serif;font-size:17px;line-height:1.6}
+h1,h2,h3,button{font-family:Rubik,Arial,sans-serif}
+header{background:var(--green);color:#fff;padding:40px 20px 32px}
+:root[data-theme="dark"] header,:root:not([data-theme="light"]) header{}
+.wrap{max-width:1040px;margin:0 auto}
+h1{font-size:clamp(34px,7vw,64px);line-height:1.05;margin:0 0 10px;font-weight:800}
+header p{margin:0 0 22px;max-width:46ch;opacity:.9}
+#q{width:100%;max-width:460px;padding:13px 16px;border-radius:999px;border:0;font:inherit;background:#fff;color:#17241D}
+#q:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--chili);border-color:var(--chili);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;padding-bottom:48px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;text-align:right;padding:0;color:inherit;font:inherit;display:block;width:100%}
+.card:hover{border-color:var(--chili)}
+.tile{height:110px;display:grid;place-items:center;font-size:56px;background:var(--tile)}
+.card .b{padding:12px 16px 16px}
+.card h3{margin:0 0 4px;font-size:19px}
+.meta{color:var(--muted);font-size:14px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+dialog{width:min(640px,94vw);max-height:90vh;border:0;border-radius:16px;padding:0;background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.d-top{background:var(--lemon);color:#17241D;padding:22px 24px;display:flex;gap:16px;align-items:center}
+.d-top .e{font-size:48px}
+.d-top h2{margin:0;font-size:26px}
+.d-body{padding:20px 24px 26px}
+.d-body h3{margin:18px 0 8px;font-size:18px;color:var(--chili)}
+.d-body ul,.d-body ol{margin:0;padding-inline-start:22px}
+.d-body li{margin-bottom:6px}
+.x{margin-inline-start:auto;border:0;background:#17241D;color:#fff;border-radius:999px;padding:7px 16px;cursor:pointer;font-size:15px}
+footer{text-align:center;color:var(--muted);padding:0 20px 36px;font-size:14px}
 </style>
 </head>
 <body>
-<div id="vig"></div><div id="cross"></div><div id="hit"></div>
-<div id="hud">
- <div id="hp"><b>חיים</b><div id="hpbar"><div id="hpfill"></div></div></div>
- <div id="ammo"><span id="am">30</span> <small>/ <span id="rs">90</span></small></div>
- <div id="info">גל <span id="wv">1</span><br>חיסולים: <span id="kl">0</span><br>ניקוד: <span id="sc">0</span></div>
- <div id="banner"></div><div id="msg"></div>
-</div>
-<div class="scr" id="menu">
- <h1>ליל המתים</h1>
- <p>הזומבים מתקרבים מכל כיוון. שרדו כמה שיותר גלים, כוונו לראש לנזק מקסימלי, ואספו תחמושת ותיקי עזרה שנופלים מהם.</p>
- <p><kbd>W A S D</kbd> תנועה &nbsp; <kbd>עכבר</kbd> כיוון &nbsp; <kbd>קליק</kbd> ירי<br><kbd>R</kbd> טעינה &nbsp; <kbd>Shift</kbd> ריצה &nbsp; <kbd>רווח</kbd> קפיצה &nbsp; <kbd>Esc</kbd> השהיה</p>
- <button id="play">התחל</button>
-</div>
-<div class="scr" id="over" style="display:none">
- <h1>מתת</h1>
- <p id="res"></p>
- <button id="again">שחק שוב</button>
-</div>
- 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<header><div class="wrap">
+<h1>המטבח שלי</h1>
+<p>מתכונים פשוטים לכל יום: חפשו מנה, בחרו קטגוריה ופתחו מתכון מלא.</p>
+<input id="q" type="search" placeholder="חיפוש מתכון או מרכיב…" aria-label="חיפוש">
+</div></header>
+<main class="wrap">
+<div class="chips" id="chips" role="group" aria-label="קטגוריות"></div>
+<div class="grid" id="grid"></div>
+</main>
+<footer>רוצים להוסיף עוד מתכונים? בקשו מ-Claude והם יתווספו לרשימה.</footer>
+<dialog id="dlg"><div id="dbox"></div></dialog>
 <script>
-const $=id=>document.getElementById(id),rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const B=44;
- 
-/* ---------- renderer & scene ---------- */
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
-document.body.prepend(renderer.domElement);
-const canvas=renderer.domElement;
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x070b16);
-scene.fog=new THREE.FogExp2(0x0b1224,0.03);
-const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,400);
-cam.rotation.order='YXZ';scene.add(cam);
- 
-scene.add(new THREE.HemisphereLight(0x7080b8,0x151510,0.55));
-const moon=new THREE.DirectionalLight(0x9db4ff,0.95);
-moon.position.set(35,60,-25);moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);
-Object.assign(moon.shadow.camera,{left:-58,right:58,top:58,bottom:-58,near:1,far:150});moon.shadow.bias=-0.0006;
-scene.add(moon);
-const torch=new THREE.SpotLight(0xfff0c8,1.8,42,0.5,0.55,1.2);
-torch.position.set(0.25,-0.1,0);torch.target.position.set(0,0,-6);cam.add(torch,torch.target);
- 
-const moonBall=new THREE.Mesh(new THREE.SphereGeometry(6,32,24),new THREE.MeshBasicMaterial({color:0xe6edff,fog:false}));
-moonBall.position.set(90,120,-140);scene.add(moonBall);
-{const p=[];for(let i=0;i<900;i++){const a=rnd(0,6.283),e=rnd(.1,1.5),r=300;p.push(Math.cos(a)*Math.cos(e)*r,Math.sin(e)*r,Math.sin(a)*Math.cos(e)*r)}
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));
- scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:1.4,sizeAttenuation:false,fog:false})))}
- 
-function ctex(c1,c2,n,rep,size=1024){const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');x.fillStyle=c1;x.fillRect(0,0,size,size);
- for(let i=0;i<n;i++){x.fillStyle=c2;x.globalAlpha=Math.random()*.4;x.beginPath();x.arc(Math.random()*size,Math.random()*size,Math.random()*6+1,0,7);x.fill()}
- const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep,rep);t.anisotropy=8;t.encoding=THREE.sRGBEncoding;return t}
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(260,260),new THREE.MeshStandardMaterial({map:ctex('#2c3724','#0e160a',14000,40),roughness:1}));
-ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
- 
-/* ---------- world ---------- */
-const obst=[],solids=[];
-const std=(c,r=.9,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
-function tree(x,z){const g=new THREE.Group(),h=rnd(3,6);
- const t=new THREE.Mesh(new THREE.CylinderGeometry(.13,.25,h,10),std(0x3a2a1c));t.position.y=h/2;t.castShadow=true;g.add(t);
- for(let i=0;i<3;i++){const c=new THREE.Mesh(new THREE.ConeGeometry(1.9-i*.5,2.3,12),std(new THREE.Color().setHSL(rnd(.28,.36),.4,rnd(.1,.16))));c.position.y=h*.55+i*1.3;c.castShadow=true;g.add(c)}
- g.position.set(x,0,z);scene.add(g);solids.push(g);obst.push({x,z,r:.5})}
-function rock(x,z){const s=rnd(.6,1.5),m=new THREE.Mesh(new THREE.DodecahedronGeometry(s,1),std(0x555a60,1));
- m.position.set(x,s*.45,z);m.scale.y=.7;m.rotation.set(rnd(0,3),rnd(0,3),0);m.castShadow=m.receiveShadow=true;scene.add(m);solids.push(m);obst.push({x,z,r:s*.9})}
-const wallMat=std(0x777b80,1);wallMat.map=ctex('#888c90','#333',6000,2,512);
-function wall(x,z,len,rot){const h=rnd(1.8,3.2),m=new THREE.Mesh(new THREE.BoxGeometry(len,h,.5),wallMat);
- m.position.set(x,h/2,z);m.rotation.y=rot;m.castShadow=m.receiveShadow=true;scene.add(m);solids.push(m);
- for(let d=-len/2;d<=len/2;d+=.6)obst.push({x:x+Math.cos(rot)*d,z:z-Math.sin(rot)*d,r:.45})}
-function grave(x,z){const m=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.18),std(0x6a6e72,1));m.position.set(x,.5,z);m.rotation.set(rnd(-.1,.1),rnd(-.5,.5),rnd(-.1,.1));m.castShadow=true;scene.add(m);solids.push(m);obst.push({x,z,r:.4})}
-const far=(r)=>{let x,z;do{x=rnd(-B,B);z=rnd(-B,B)}while(Math.hypot(x,z)<r);return[x,z]};
-for(let i=0;i<64;i++){const a=i/64*6.283;tree(Math.cos(a)*(B+3)+rnd(-2,2),Math.sin(a)*(B+3)+rnd(-2,2))}
-for(let i=0;i<50;i++)tree(...far(7));
-for(let i=0;i<22;i++)rock(...far(5));
-for(let i=0;i<7;i++){const[x,z]=far(10);wall(x,z,rnd(4,9),rnd(0,3.14))}
-for(let i=0;i<24;i++)grave(...far(6));
- 
-/* ---------- player & gun ---------- */
-const P={pos:new THREE.Vector3(0,1.7,0),vy:0,hp:100,yaw:0,pitch:0};
-let ammo=30,reserve=90,reloading=0;
-const gun=new THREE.Group(),gm=std(0x1b1d22,.35,.8);
-const gp=(geo,m,x,y,z,rx=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.rotation.x=rx;gun.add(o);return o};
-gp(new THREE.BoxGeometry(.07,.1,.52),gm,0,0,-.1);
-gp(new THREE.CylinderGeometry(.016,.016,.38,12),gm,0,.02,-.52,Math.PI/2);
-gp(new THREE.BoxGeometry(.055,.17,.07),gm,0,-.12,.06,.25);
-gp(new THREE.BoxGeometry(.05,.15,.07),std(0x2a2c30,.5,.6),0,-.13,-.12,-.1);
-gp(new THREE.BoxGeometry(.02,.04,.02),gm,0,.075,-.3);
-gp(new THREE.BoxGeometry(.06,.1,.2),std(0x3a2a1c,.8),0,-.02,.28);
-const flash=new THREE.Mesh(new THREE.SphereGeometry(.07,10,8),new THREE.MeshBasicMaterial({color:0xffc060,transparent:true,opacity:.95}));
-flash.position.set(0,.02,-.75);flash.visible=false;gun.add(flash);
-const flashL=new THREE.PointLight(0xffaa55,0,14);flashL.position.set(0,.05,-.9);gun.add(flashL);
-gun.position.set(.22,-.21,-.42);cam.add(gun);
- 
-/* ---------- audio ---------- */
-let ac;const A=()=>ac=ac||new(window.AudioContext||window.webkitAudioContext)();
-function noise(dur,freq,vol){try{const a=A(),n=a.sampleRate*dur,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
- for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
- const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;const g=a.createGain();g.gain.value=vol;
- s.connect(f);f.connect(g);g.connect(a.destination);s.start()}catch(e){}}
-function groan(v){try{const a=A(),t=a.currentTime,o=a.createOscillator(),l=a.createOscillator(),lg=a.createGain(),g=a.createGain(),f=a.createBiquadFilter();
- o.type='sawtooth';o.frequency.value=rnd(50,85);l.frequency.value=rnd(4,8);lg.gain.value=14;l.connect(lg);lg.connect(o.frequency);
- f.type='lowpass';f.frequency.value=380;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.14*v,t+.25);g.gain.linearRampToValueAtTime(0,t+1);
- o.connect(f);f.connect(g);g.connect(a.destination);o.start();l.start();o.stop(t+1);l.stop(t+1)}catch(e){}}
- 
-/* ---------- zombies ---------- */
-let zs=[],picks=[],parts=[],tracers=[];
-function makeZombie(w){
- const g=new THREE.Group();g.rotation.order='YXZ';
- const skin=std(new THREE.Color().setHSL(rnd(.22,.3),rnd(.25,.4),rnd(.28,.4)));
- const shirt=std(new THREE.Color().setHSL(Math.random(),.25,.2)),pants=std(0x23232b);
- const add=(geo,m,x,y,z,par=g)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;par.add(o);return o};
- add(new THREE.BoxGeometry(.56,.72,.3),shirt,0,1.2,0);
- const head=add(new THREE.SphereGeometry(.21,24,18),skin,0,1.75,.03);head.scale.set(1,1.1,1);head.userData.head=true;
- [-.08,.08].forEach(x=>{const e=add(new THREE.SphereGeometry(.035,8,8),new THREE.MeshBasicMaterial({color:0xff2200}),x,.04,.19,head);e.userData.head=true;e.castShadow=false});
- const limb=(x,y,wd,h,m,rx)=>{const p=new THREE.Group();p.position.set(x,y,0);g.add(p);add(new THREE.BoxGeometry(wd,h,wd),m,0,-h/2,0,p);p.rotation.x=rx;return p};
- const z={g,armL:limb(-.37,1.5,.15,.62,skin,-1.4),armR:limb(.37,1.5,.15,.62,skin,-1.5),legL:limb(-.14,.85,.2,.85,pants,0),legR:limb(.14,.85,.2,.85,pants,0),
-  hp:50+w*10,speed:rnd(1.3,1.9)+w*.12,t:rnd(0,9),dead:false,cd:0,dying:0,stun:0,gt:rnd(2,6)};
- g.userData.z=z;g.scale.setScalar(rnd(.95,1.1));return z}
-function spawn(){const z=makeZombie(wave);let x,y;
- do{const a=rnd(0,6.283),r=rnd(26,38);x=clamp(P.pos.x+Math.cos(a)*r,-B,B);y=clamp(P.pos.z+Math.sin(a)*r,-B,B)}while(Math.hypot(x-P.pos.x,y-P.pos.z)<22);
- z.g.position.set(x,0,y);scene.add(z.g);zs.push(z)}
-function push(p,r){for(const o of obst){const dx=p.x-o.x,dz=p.z-o.z,d=Math.hypot(dx,dz),m=o.r+r;if(d<m&&d>1e-4){p.x=o.x+dx/d*m;p.z=o.z+dz/d*m}}
- p.x=clamp(p.x,-B,B);p.z=clamp(p.z,-B,B)}
- 
-/* ---------- effects ---------- */
-const pg=new THREE.SphereGeometry(.035,6,6),pm={};
-function burst(pt,c,n){pm[c]=pm[c]||new THREE.MeshBasicMaterial({color:c});
- for(let i=0;i<n;i++){const m=new THREE.Mesh(pg,pm[c]);m.position.copy(pt);scene.add(m);parts.push({m,v:new THREE.Vector3(rnd(-2,2),rnd(.5,3),rnd(-2,2)),l:rnd(.4,.8)})}}
-function tracer(a,b){const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,b]),new THREE.LineBasicMaterial({color:0xffe9a0,transparent:true,opacity:.7}));scene.add(l);tracers.push({l,t:.06})}
-function drop(pos){const r=Math.random();if(r>.4)return;const ammoD=r<.25,m=new THREE.Mesh(new THREE.BoxGeometry(.35,.25,.25),new THREE.MeshStandardMaterial({color:ammoD?0xe0b020:0x22cc55,emissive:ammoD?0x604800:0x0a5522,roughness:.5}));
- m.position.set(pos.x,.4,pos.z);m.castShadow=true;scene.add(m);picks.push({m,ammo:ammoD,x:pos.x,z:pos.z,t:rnd(0,6)})}
- 
-/* ---------- game state ---------- */
-let wave=0,toSpawn=0,spT=0,between=2,score=0,kills=0,playing=false,locked=false,over=false,firing=false,fireT=0,recoil=0,flashT=0,hurt=0,hitT=0,bobT=0,moving=false;
-const keys={},ray=new THREE.Raycaster(),clock=new THREE.Clock();
-const say=(t)=>{const m=$('msg');m.textContent=t;m.style.opacity=1;clearTimeout(say.h);say.h=setTimeout(()=>m.style.opacity=0,1400)};
-function banner(t){const b=$('banner');b.textContent=t;b.style.opacity=1;setTimeout(()=>b.style.opacity=0,2200)}
-function hud(){$('am').textContent=ammo;$('rs').textContent=reserve;$('wv').textContent=Math.max(wave,1);$('kl').textContent=kills;$('sc').textContent=score;$('hpfill').style.width=Math.max(P.hp,0)+'%'}
-function reload(){if(reloading||ammo>=30||reserve<=0)return;reloading=1.5;say('טוען...')}
-function reset(){zs.forEach(z=>scene.remove(z.g));picks.forEach(p=>scene.remove(p.m));zs=[];picks=[];
- Object.assign(P,{hp:100,yaw:0,pitch:0,vy:0});P.pos.set(0,1.7,0);ammo=30;reserve=90;reloading=0;wave=0;toSpawn=0;between=2;score=0;kills=0;over=false;hud()}
-function kill(z,head){z.dead=true;z.dying=0;score+=head?150:100;kills++;drop(z.g.position);hud();if(head)say('בול בראש!')}
-function shoot(){
- if(reloading)return;if(ammo<=0){reload();return}
- ammo--;fireT=.11;recoil=1;flashT=.05;noise(.18,2600,.5);hud();
- cam.updateMatrixWorld();
- ray.setFromCamera({x:rnd(-.004,.004),y:rnd(-.004,.004)},cam);
- const h=ray.intersectObjects([...zs.filter(z=>!z.dead).map(z=>z.g),...solids],true)[0];
- const end=h?h.point:ray.ray.at(70,new THREE.Vector3());
- if(h){let o=h.object,zz=null;while(o){if(o.userData.z){zz=o.userData.z;break}o=o.parent}
-  if(zz){const hd=!!h.object.userData.head;zz.hp-=hd?80:26;zz.stun=.2;burst(h.point,0x8a0a0a,10);hitT=.15;noise(.08,600,.5);if(zz.hp<=0)kill(zz,hd)}
-  else burst(h.point,0xbbbbbb,5)}
- tracer(gun.localToWorld(new THREE.Vector3(0,.02,-.75)),end);
- if(ammo===0&&reserve>0)setTimeout(reload,200)}
- 
-/* ---------- loop ---------- */
-function update(dt){
- /* look & move */
- cam.rotation.set(P.pitch,P.yaw,0);
- const mx=(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=(keys.KeyW?1:0)-(keys.KeyS?1:0);
- moving=!!(mx||mz);
- if(moving){const sp=(keys.ShiftLeft||keys.ShiftRight)?8.2:5,l=Math.hypot(mx,mz);
-  P.pos.x+=(-Math.sin(P.yaw)*mz+Math.cos(P.yaw)*mx)/l*sp*dt;P.pos.z+=(-Math.cos(P.yaw)*mz-Math.sin(P.yaw)*mx)/l*sp*dt;bobT+=dt*sp*1.5}
- push(P.pos,.4);
- P.vy-=22*dt;P.pos.y+=P.vy*dt;if(P.pos.y<=1.7){P.pos.y=1.7;P.vy=0;if(keys.Space)P.vy=7}
- const bob=moving&&P.pos.y<=1.71?Math.sin(bobT*2)*.045:0;
- cam.position.set(P.pos.x,P.pos.y+bob,P.pos.z);
- /* weapon */
- fireT-=dt;if(firing&&fireT<=0)shoot();
- recoil=Math.max(0,recoil-dt*9);
- if(reloading>0){reloading-=dt;if(reloading<=0){const t=Math.min(30-ammo,reserve);ammo+=t;reserve-=t;hud()}}
- const rl=reloading>0?Math.sin(clamp(1-reloading/1.5,0,1)*Math.PI):0;
- gun.position.set(.22+Math.sin(bobT)*.006,-.21+Math.abs(Math.cos(bobT))*.008-rl*.25,-.42+recoil*.07);
- gun.rotation.set(recoil*.08+rl*.7,0,rl*.3);
- flashT-=dt;flash.visible=flashT>0;flashL.intensity=flashT>0?3:0;flash.scale.setScalar(rnd(.8,1.6));
- /* waves */
- const alive=zs.filter(z=>!z.dead).length;
- if(toSpawn>0){spT-=dt;if(spT<=0&&alive<22){spawn();toSpawn--;spT=Math.max(.5,2-wave*.12)}}
- else if(alive===0){between-=dt;if(between<=0){wave++;toSpawn=5+wave*3;between=4;banner('גל '+wave);hud()}}
- /* zombies */
- for(let i=zs.length-1;i>=0;i--){const z=zs[i],g=z.g;
-  if(z.dead){z.dying+=dt;g.rotation.x=-Math.min(1,z.dying*2.2)*Math.PI/2;g.position.y=Math.min(1,z.dying*2.2)*.22;
-   if(z.dying>6)g.position.y-=(z.dying-6)*.3;if(z.dying>9){scene.remove(g);zs.splice(i,1)}continue}
-  const dx=P.pos.x-g.position.x,dz=P.pos.z-g.position.z,d=Math.hypot(dx,dz);
-  g.rotation.y=Math.atan2(dx,dz);z.t+=dt;z.stun-=dt;
-  if(d>1.2&&z.stun<=0){const s=z.speed*dt;g.position.x+=dx/d*s;g.position.z+=dz/d*s;push(g.position,.35)}
-  const sw=Math.sin(z.t*4.5);z.legL.rotation.x=sw*.6;z.legR.rotation.x=-sw*.6;
-  z.armL.rotation.x=-1.4+Math.sin(z.t*3)*.15;z.armR.rotation.x=-1.5-Math.sin(z.t*3+1)*.15;
-  g.children[0].rotation.x=.12;
-  z.cd-=dt;if(d<1.5&&z.cd<=0&&!over){z.cd=1;P.hp-=8+wave*1.2;hurt=1;noise(.2,300,.6);hud();
-   if(P.hp<=0){over=true;playing=false;document.exitPointerLock();$('res').textContent='שרדת עד גל '+Math.max(wave,1)+' עם '+kills+' חיסולים וניקוד '+score+'.';$('over').style.display='flex'}}
-  z.gt-=dt;if(z.gt<=0){z.gt=rnd(4,9);if(d<30)groan(clamp(1-d/30,.1,1))}}
- /* pickups */
- for(let i=picks.length-1;i>=0;i--){const p=picks[i];p.t+=dt;p.m.rotation.y+=dt*2;p.m.position.y=.45+Math.sin(p.t*3)*.1;
-  if(Math.hypot(p.x-P.pos.x,p.z-P.pos.z)<1.5){if(p.ammo){reserve+=30;say('+30 תחמושת')}else{P.hp=Math.min(100,P.hp+25);say('+25 חיים')}hud();scene.remove(p.m);picks.splice(i,1)}}
- /* particles */
- for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.l-=dt;p.v.y-=9*dt;p.m.position.addScaledVector(p.v,dt);if(p.l<=0||p.m.position.y<0){scene.remove(p.m);parts.splice(i,1)}}
- for(let i=tracers.length-1;i>=0;i--){const t=tracers[i];t.t-=dt;if(t.t<=0){scene.remove(t.l);t.l.geometry.dispose();tracers.splice(i,1)}}
- hurt=Math.max(0,hurt-dt*1.5);$('vig').style.opacity=Math.min(1,hurt+(P.hp<30?.35:0));
- hitT-=dt;$('hit').style.opacity=hitT>0?1:0;
+const R=[
+{n:"שקשוקה",c:"בוקר",t:25,e:"🍳",i:["2 כפות שמן זית","1 בצל קצוץ","3 שיני שום","1 פלפל אדום קצוץ","6 עגבניות בשלות או קופסת עגבניות מרוסקות","1 כפית פפריקה","½ כפית כמון","4 ביצים","מלח ופלפל"],s:["מטגנים בצל ופלפל בשמן זית 5 דקות.","מוסיפים שום ותבלינים ומערבבים דקה.","מוסיפים עגבניות ומבשלים 10 דקות עד שהרוטב מסמיך.","יוצרים גומחות, שוברים ביצים ומבשלים מכוסה 5 דקות.","מגישים עם לחם טרי."]},
+{n:"פנקייק רך",c:"בוקר",t:20,e:"🥞",i:["1½ כוסות קמח","1 כף סוכר","2 כפיות אבקת אפייה","¼ כפית מלח","1¼ כוסות חלב","1 ביצה","3 כפות חמאה מומסת"],s:["מערבבים את היבשים בקערה.","מקציפים חלב, ביצה וחמאה ומוסיפים ליבשים, מערבבים קצת בלבד.","מחממים מחבת ומוזגים כמות קטנה של בלילה.","הופכים כשמופיעות בועות ומטגנים עוד דקה.","מגישים עם מייפל או פירות."]},
+{n:"חביתה עם עשבי תיבול",c:"בוקר",t:10,e:"🥚",i:["3 ביצים","1 כף חלב","חופן פטרוזיליה ושמיר קצוצים","1 כפית חמאה","מלח ופלפל"],s:["טורפים ביצים עם חלב, עשבים ותבלין.","ממיסים חמאה במחבת בינונית.","יוצקים ומבשלים על אש נמוכה עד שהשולי מתייצבים.","מקפלים ומגישים חם."]},
+{n:"פסטה ברוטב עגבניות",c:"עיקריות",t:30,e:"🍝",i:["400 גרם פסטה","2 כפות שמן זית","4 שיני שום","קופסת עגבניות מרוסקות","1 כפית אורגנו","עלי בזיליקום","פרמזן מגורד"],s:["מבשלים פסטה לפי ההוראות ושומרים כוס מי בישול.","מטגנים שום בשמן זית חצי דקה.","מוסיפים עגבניות ואורגנו ומבשלים 12 דקות.","מערבבים עם הפסטה, מוסיפים מעט מי בישול.","מפזרים בזיליקום ופרמזן."]},
+{n:"שניצל תנור פריך",c:"עיקריות",t:35,e:"🍗",i:["4 חזות עוף פרוסות דק","1 כוס פירורי לחם","½ כפית פפריקה","2 ביצים טרופות","½ כוס קמח","2 כפות שמן","מלח ופלפל"],s:["מחממים תנור ל-200 מעלות.","מתבלים את העוף ומעבירים בקמח, בביצה ובפירורים.","מסדרים על תבנית עם נייר אפייה ומתיזים שמן.","אופים 12 דקות, הופכים ואופים עוד 10 דקות.","מגישים עם לימון."]},
+{n:"מג׳דרה",c:"עיקריות",t:45,e:"🍚",i:["1 כוס עדשים חומות","1 כוס אורז","3 בצלים פרוסים","4 כפות שמן","1 כפית כמון","3 כוסות מים","מלח"],s:["מבשלים עדשים במים 15 דקות.","מטגנים בצלים בשמן עד שהם מזהיבים ומקורמלים, ומשאירים חצי בצד.","מוסיפים אורז, כמון ומלח לעדשים ומבשלים מכוסה 20 דקות.","מגישים עם הבצל המטוגן ויוגורט."]},
+{n:"סלמון בתנור",c:"עיקריות",t:25,e:"🐟",i:["4 פילטים של סלמון","2 כפות שמן זית","2 שיני שום כתושות","מיץ וקליפת לימון","שמיר","מלח ופלפל"],s:["מחממים תנור ל-200 מעלות.","מערבבים שמן, שום, לימון ותבלינים.","מורחים על הדגים ואופים 12 דקות.","מפזרים שמיר ומגישים."]},
+{n:"סלט ישראלי",c:"סלטים ומרקים",t:10,e:"🥗",i:["4 עגבניות","3 מלפפונים","1 בצל סגול קטן","חופן פטרוזיליה","3 כפות שמן זית","מיץ מלימון אחד","מלח"],s:["קוצצים את הירקות לקוביות קטנות.","מערבבים עם שמן, לימון ומלח.","מגישים מיד כדי שיישאר פריך."]},
+{n:"חומוס ביתי",c:"סלטים ומרקים",t:20,e:"🧆",i:["2 כוסות חומוס מבושל","½ כוס טחינה גולמית","מיץ מ-2 לימונים","2 שיני שום","½ כפית כמון","¼ כוס מים קרים","מלח"],s:["טוחנים טחינה, לימון ושום במעבד מזון עד שמתקבל קרם.","מוסיפים חומוס, כמון ומלח וטוחנים 3 דקות.","מוסיפים מים קרים עד לקרמיות הרצויה.","מגישים עם שמן זית ופפריקה."]},
+{n:"מרק עוף ביתי",c:"סלטים ומרקים",t:90,e:"🍲",i:["1 עוף חתוך","2 גזרים","2 סלרי","1 בצל","1 פרוסת דלעת","פטרוזיליה","מלח ופלפל","מים לכיסוי"],s:["מכסים עוף במים ומביאים לרתיחה, ומקלפים את הקצף.","מוסיפים ירקות ותבלינים.","מבשלים על אש נמוכה שעה וחצי.","מסננים או מגישים עם הירקות ואטריות."]},
+{n:"עוגת שוקולד בקערה אחת",c:"קינוחים",t:50,e:"🍫",i:["1½ כוסות קמח","1 כוס סוכר","⅓ כוס קקאו","1 כפית סודה לשתייה","1 כוס מים חמים","½ כוס שמן","1 כף חומץ","1 כפית וניל"],s:["מחממים תנור ל-175 מעלות.","מערבבים יבשים בתבנית משומנת.","מוסיפים נוזלים ומערבבים עד חלקות.","אופים 35 דקות ומצננים לפני החיתוך."]},
+{n:"עוגיות שוקולד צ׳יפס",c:"קינוחים",t:25,e:"🍪",i:["2¼ כוסות קמח","1 כפית סודה לשתייה","1 כוס חמאה רכה","¾ כוס סוכר","¾ כוס סוכר חום","2 ביצים","2 כוסות שוקולד צ׳יפס"],s:["מחממים תנור ל-180 מעלות.","מקציפים חמאה וסוכרים, מוסיפים ביצים.","מערבבים פנימה קמח וסודה ואז שוקולד.","יוצרים כדורים ואופים 10 דקות.","מצננים על התבנית 5 דקות."]}
+];
+const cats=["הכל",...new Set(R.map(r=>r.c))];
+let cat="הכל";
+const $=id=>document.getElementById(id);
+function chips(){$("chips").innerHTML=cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}
+function render(){
+ const q=$("q").value.trim();
+ const list=R.filter(r=>(cat==="הכל"||r.c===cat)&&(!q||(r.n+r.i.join(" ")).includes(q)));
+ $("grid").innerHTML=list.length?list.map(r=>`<button class="card" data-n="${r.n}"><div class="tile">${r.e}</div><div class="b"><h3>${r.n}</h3><div class="meta">${r.c} • ${r.t} דקות</div></div></button>`).join(""):`<div class="empty">לא נמצאו מתכונים. נסו חיפוש אחר.</div>`;
 }
-function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);if(playing&&locked)update(dt);renderer.render(scene,cam)}
- 
-/* ---------- input ---------- */
-addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR'&&playing)reload();if(e.code==='Space')e.preventDefault()});
-addEventListener('keyup',e=>keys[e.code]=false);
-addEventListener('mousemove',e=>{if(!locked)return;P.yaw-=e.movementX*.0022;P.pitch=clamp(P.pitch-e.movementY*.0022,-1.5,1.5)});
-addEventListener('mousedown',e=>{if(locked&&e.button===0){firing=true;A().resume&&A().resume()}});
-addEventListener('mouseup',e=>{if(e.button===0)firing=false});
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;
- if(!locked){firing=false;if(!over){$('menu').style.display='flex';$('play').textContent='המשך'}}else $('menu').style.display='none'});
-$('play').onclick=()=>{playing=true;canvas.requestPointerLock();A().resume&&A().resume()};
-$('again').onclick=()=>{reset();$('over').style.display='none';playing=true;canvas.requestPointerLock()};
-addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-hud();loop();
+function open(n){
+ const r=R.find(x=>x.n===n);
+ $("dbox").innerHTML=`<div class="d-top"><span class="e">${r.e}</span><div><h2>${r.n}</h2><div>${r.c} • ${r.t} דקות</div></div><button class="x" id="close">סגירה</button></div><div class="d-body"><h3>מרכיבים</h3><ul>${r.i.map(x=>`<li>${x}</li>`).join("")}</ul><h3>אופן ההכנה</h3><ol>${r.s.map(x=>`<li>${x}</li>`).join("")}</ol></div>`;
+ $("dlg").showModal();
+}
+$("chips").onclick=e=>{const b=e.target.closest("[data-c]");if(b){cat=b.dataset.c;chips();render()}};
+$("grid").onclick=e=>{const b=e.target.closest("[data-n]");if(b)open(b.dataset.n)};
+$("q").oninput=render;
+$("dlg").onclick=e=>{if(e.target===$("dlg")||e.target.id==="close")$("dlg").close()};
+chips();render();
 </script>
 </body>
 </html>
